@@ -46,13 +46,14 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
             if(computedHash[i] != user.PasswordHash[i])
                 return Unauthorized("Invalid Password");
         }
-        return new UserDto
-        {
-            Id = user.Id,
-            DisplayName = user.DisplayName,
-            Email = user.Email,
-            Token = tokenService.CreateToken(user)
-        };
+        // return new UserDto
+        // {
+        //     Id = user.Id,
+        //     DisplayName = user.DisplayName,
+        //     Email = user.Email,
+        //     Token = tokenService.CreateToken(user)
+        // };
+        return user.ToDto(tokenService);
     }
     private async Task<bool>EmailExists(string email)
     {
