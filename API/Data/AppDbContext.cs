@@ -1,6 +1,7 @@
 using System;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data;
 
@@ -8,6 +9,26 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<AppUser> Users {get; set;}
     public DbSet<Member> Members { get; set; }
-    public DbSet<Photo> photos
-     { get; set; }
+    public DbSet<Photo> photos { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+            v => v.ToUniversalTime(), // Convert to UTC when saving to the database
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Convert back to UTC when reading from the database
+        );
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTime))
+                {
+                    property.SetValueConverter(dateTimeConverter);
+                }
+            }
+        }
+    }
 }
