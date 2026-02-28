@@ -11,5 +11,4 @@ public interface ILikesRepository
     Task<IReadOnlyList<string>> GetCurrentUserLikeIds(string memberId);
     void DeleteLike(MemberLike memberLike);
     void AddLike(MemberLike memberLike);
-    Task<bool> SaveAllChanges();
 }

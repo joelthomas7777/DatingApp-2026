@@ -67,16 +67,20 @@ export class AccountService {
     user.roles = this.getRolesFromToken(user);
     this.currentUser.set(user)
     this.likesService.getLikeIds();
-    if(this.presenceService.hubConnection?.state !== HubConnectionState.Connected) {
+    if (this.presenceService.hubConnection?.state !== HubConnectionState.Connected) {
       this.presenceService.createHubConnection(user);
     }
   }
 
   logout() {
-    localStorage.removeItem('filters');
-    this.likesService.clearLikeIds();
-    this.currentUser.set(null);
-    this.presenceService.stopHubConnection();
+    this.http.post(this.baseUrl + 'account/logout', {}, { withCredentials: true }).subscribe({
+      next: () => {
+        localStorage.removeItem('filters');
+        this.likesService.clearLikeIds();
+        this.currentUser.set(null);
+        this.presenceService.stopHubConnection();
+      }
+    })
   }
 
   private getRolesFromToken(user: User): string[] {
