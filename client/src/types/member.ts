@@ -16,6 +16,7 @@ export type Photo = {
     url: string
     publicId?: string
     memberId: string
+    isApproved: boolean
 }
 
 export type EditableMember = {
@@ -25,7 +26,7 @@ export type EditableMember = {
     country: string;
 }
 
-export class MemberParams{
+export class MemberParams {
     gender?: string;
     minAge = 18;
     maxAge = 100;

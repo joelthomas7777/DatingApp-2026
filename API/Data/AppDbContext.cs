@@ -10,7 +10,7 @@ namespace API.Data;
 public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
 {
     public DbSet<Member> Members { get; set; }
-    public DbSet<Photo> photos { get; set; }
+    public DbSet<Photo> Photos { get; set; }
     public DbSet<MemberLike> Likes { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Group> Groups { get; set; }
@@ -19,6 +19,8 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Photo>().HasQueryFilter(x => x.IsApproved);
 
         modelBuilder.Entity<IdentityRole>().HasData(
             new IdentityRole { Id = "member-id", Name = "Member", NormalizedName = "MEMBER" },

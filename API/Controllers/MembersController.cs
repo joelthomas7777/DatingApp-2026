@@ -35,7 +35,8 @@ namespace API.Controllers
         [HttpGet("{id}/photos")]
         public async Task<ActionResult<IReadOnlyList<Photo>>> GetMemberPhotos(string id)
         {
-            return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id));
+            var isCurrentUser = User.GetMemberId() == id;
+            return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id, isCurrentUser));
         }
 
         [HttpPut]
@@ -75,11 +76,6 @@ namespace API.Controllers
                 MemberId = User.GetMemberId()
             };
 
-            if (member.ImageUrl == null)
-            {
-                member.ImageUrl = photo.Url;
-                member.User.ImageUrl = photo.Url;
-            }
             member.Photos.Add(photo);
 
             if (await uow.Complete()) return photo;
@@ -92,7 +88,7 @@ namespace API.Controllers
             if (member == null) return BadRequest("Cannot get member from token");
 
             var photo = member.Photos.SingleOrDefault(x => x.Id == photoId);
-            if(member.ImageUrl == photo?.Url || photo == null)
+            if (member.ImageUrl == photo?.Url || photo == null)
             {
                 return BadRequest("Cannot set this as main image");
             }
@@ -111,7 +107,7 @@ namespace API.Controllers
             if (member == null) return BadRequest("Cannot get member from token");
 
             var photo = member.Photos.SingleOrDefault(x => x.Id == photoId);
-            if (photo == null || photo.Url == member.ImageUrl) 
+            if (photo == null || photo.Url == member.ImageUrl)
             {
                 return BadRequest("This photo cannot be deleted");
             }
